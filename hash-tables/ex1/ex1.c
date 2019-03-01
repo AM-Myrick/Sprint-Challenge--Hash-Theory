@@ -6,40 +6,37 @@
 Answer *get_indices_of_item_weights(int *weights, int length, int limit)
 {
   HashTable *ht = create_hash_table(16);
-  typedef struct Answer {
-    int index_1;
-    int index_2;
-  } Answer;
+  Answer *answer = malloc(sizeof(Answer));
+  answer->index_1 = -1;
+  answer->index_2 = -1;
 
-  Answer *create_answer(int index_1, int index_2)
-  {
-    Answer *answer = malloc(sizeof(Answer));
-    if (index_1 > index_2) 
-    {
-      answer->index_1 = index_1;
-      answer->index_2 = index_2;
-    }
-    else
-    {
-      answer->index_1 = index_2;
-      answer->index_2 = index_1;
-    }
-    return answer;
-  }
   for (int i = 0; i < length; i++)
   {
-    hash_table_insert(ht, i, weights[i]);
+    hash_table_insert(ht, weights[i], i);
   }
 
-  for (int i = 0; i < ht->capacity; i++)
+  for (int i = 0; i < length; i++)
   {
-    int index_1;
-    if (hash_table_retrieve(ht, i) != NULL) {
-      index_1 = hash_table_retrieve(ht, i);
+    if (hash_table_retrieve(ht, limit - weights[i]) != -1)
+    {
+      if (answer->index_2 == -1)
+      {
+        answer->index_2 = i;
+      }
+      else
+      {
+        answer->index_1 = i;
+      }
     }
   }
+  destroy_hash_table(ht);
 
-  return NULL;
+  if (answer->index_1 == -1)
+  {
+    return NULL;
+  }
+
+  return answer;
 }
 
 void print_answer(Answer *answer)
